@@ -1,10 +1,145 @@
-<input type="text" id="searchInput" placeholder="搜索标题、描述、URL 或标签…" autocomplete="off">
+
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>书签管理器</title>
+<style>:root{--bg:#f5f6f8;--surface:#fff;--text:#1a1a2e;--text2:#6b6f8a;--text3:#9ca1b7;--border:#e4e6eb;--border2:#d0d3dd;--primary:#4a6cf7;--primary-h:#3b5de7;--danger:#e34f4f;--danger-bg:#fef0f0;--hover:#f5f6f8;--active:#eef1fe;--tag:#eef0f6;--tag-h:#dfe2ee;--tag-t:#4a4d67;--chip:#f5f6f8;--chip-h:#edeff5;--modal:rgba(0,0,0,.3);--input:#fafafa;--input-f:#fff;--lock-bg:#f5f6f8;--scroll:#d0d3dd;--fs:14px}
+[data-theme=dark]{--bg:#13142a;--surface:#1e1f3a;--text:#e4e6eb;--text2:#9ca1b7;--text3:#6b6f8a;--border:#2d2f4a;--border2:#3a3c58;--primary:#6b8aff;--primary-h:#5a7af0;--danger:#f06a6a;--danger-bg:#3a1e28;--hover:#262842;--active:#1a1c36;--tag:#2d2f4a;--tag-h:#3a3c58;--tag-t:#c4c6d8;--chip:#262842;--chip-h:#2d2f4a;--modal:rgba(0,0,0,.55);--input:#262842;--input-f:#2d2f4a;--lock-bg:#13142a;--scroll:#3a3c58}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:var(--fs)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+header h1{font-size:1.15rem;font-weight:600}
+.hdr-right{display:flex;align-items:center;gap:.6rem}
+.hdr-right .stats{font-size:.85rem;color:var(--text2)}
+.hdr-right .stats span{font-weight:600;color:var(--text)}
+.hdr-btn{background:none;border:none;font-size:1.1rem;cursor:pointer;padding:.15rem .3rem;border-radius:4px;line-height:1;transition:background .12s;color:var(--text2)}
+.hdr-btn:hover{background:var(--hover);color:var(--text)}
+.auto-lock-indicator{font-size:.72rem;color:var(--text3);margin-left:.1rem;display:none}
+.hdr-right.unlocked .auto-lock-indicator{display:inline}
+.layout{display:flex;flex:1;min-height:0}
+.sidebar{width:200px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:.75rem 0;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-title{font-size:.75rem;font-weight:600;color:var(--text3);padding:0 1rem .4rem;letter-spacing:.04em;text-transform:uppercase}
+.group-item,.tag-sb-item{display:flex;align-items:center;justify-content:space-between;padding:.35rem 1rem;cursor:pointer;font-size:.85rem;color:var(--text);border-left:3px solid transparent;transition:background .1s}
+.group-item:hover,.tag-sb-item:hover{background:var(--hover)}
+.group-item.active,.tag-sb-item.active{background:var(--active);border-left-color:var(--primary);font-weight:600}
+.group-item .gname{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.group-item .gcount,.tag-sb-item .tcount{font-size:.73rem;color:var(--text3);margin-left:.4rem;flex-shrink:0}
+.group-actions{display:none;align-items:center;gap:.1rem;flex-shrink:0;margin-left:.2rem}
+.group-item:hover .group-actions{display:flex}
+.group-actions button{background:none;border:none;cursor:pointer;font-size:.7rem;color:var(--text3);padding:.1rem .2rem;border-radius:3px;line-height:1}
+.group-actions button:hover{color:var(--text);background:var(--hover)}
+.group-actions .del-group:hover{color:var(--danger)}
+.sidebar-divider{height:1px;background:var(--border);margin:.4rem 1rem}
+.add-group-btn{margin:.2rem .75rem;padding:.35rem .7rem;border:1px dashed var(--border2);border-radius:6px;background:transparent;font-size:.8rem;color:var(--text2);cursor:pointer;transition:all .12s;text-align:left}
+.add-group-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--active)}
+.main-area{flex:1;max-width:100%;padding:1.25rem 1.5rem 3rem;overflow-y:auto}
+.add-card{background:var(--surface);border-radius:8px;padding:1.1rem 1.25rem;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:1rem;max-width:780px}
+.add-card h2{font-size:.95rem;font-weight:600;margin-bottom:.8rem}
+.form-row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-start}
+.form-row input,.form-row select,.form-row textarea{flex:1 1 160px;padding:.5rem .65rem;border:1px solid var(--border2);border-radius:6px;font-size:.875rem;background:var(--input);outline:none;transition:border-color .15s,box-shadow .15s;color:var(--text)}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(74,108,247,.12);background:var(--input-f)}
+.form-row textarea{min-height:2.5rem;resize:vertical;font-family:inherit}
+.form-row select{cursor:pointer}
+.btn{padding:.5rem .9rem;border:none;border-radius:6px;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-h)}
+.btn-danger{background:transparent;color:var(--danger);padding:.25rem .4rem;font-size:.8rem}
+.btn-danger:hover{background:var(--danger-bg)}
+.btn-ghost{background:transparent;color:var(--text2);padding:.25rem .35rem;font-size:.8rem;line-height:1}
+.btn-ghost:hover{background:var(--hover);color:var(--text)}
+.btn-cancel{background:var(--hover);color:var(--text)}
+.btn-cancel:hover{background:var(--chip-h)}
+.filter-bar{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;max-width:780px}
+.filter-bar input{flex:1 1 180px;padding:.45rem .65rem;border:1px solid var(--border2);border-radius:6px;font-size:.85rem;background:var(--surface);outline:none;transition:border-color .15s;color:var(--text)}
+.filter-bar input:focus{border-color:var(--primary)}
+.tag-filter-group{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center}
+.tag-chip{display:inline-flex;align-items:center;gap:.2rem;padding:.2rem .5rem;border-radius:100px;font-size:.76rem;cursor:pointer;border:1px solid var(--border2);background:var(--chip);color:var(--text);transition:all .12s;user-select:none}
+.tag-chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tag-chip:hover:not(.active){border-color:var(--text3);background:var(--chip-h)}
+.filter-clear{font-size:.78rem;color:var(--text2);cursor:pointer;text-decoration:underline dotted;padding:.15rem .3rem}
+.filter-clear:hover{color:var(--text)}
+.bookmark-list{display:flex;flex-direction:column;gap:.5rem;max-width:780px}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:.9rem}
+.bookmark-item{background:var(--surface);border-radius:8px;padding:.75rem 1rem;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;align-items:flex-start;gap:.65rem;transition:box-shadow .12s}
+.bookmark-item:hover{box-shadow:0 1px 6px rgba(0,0,0,.08)}
+.bookmark-icon{flex-shrink:0;width:28px;height:28px;border-radius:6px;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--text2);overflow:hidden}
+.bookmark-icon img{width:100%;height:100%;object-fit:cover;border-radius:6px}
+.bookmark-body{flex:1;min-width:0}
+.bookmark-title{font-weight:600;font-size:.88rem;color:var(--text);text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bookmark-title:hover{color:var(--primary)}
+.bookmark-url{font-size:.76rem;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:.1rem}
+.bookmark-desc{font-size:.78rem;color:var(--text2);line-height:1.4;margin-top:.25rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bookmark-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.35rem}
+.bookmark-tag{display:inline-block;padding:.12rem .4rem;border-radius:100px;font-size:.7rem;background:var(--tag);color:var(--tag-t);cursor:pointer;transition:background .1s}
+.bookmark-tag:hover{background:var(--tag-h)}
+.bookmark-actions{flex-shrink:0;display:flex;gap:.15rem;margin-top:.05rem}
+.modal-overlay{position:fixed;inset:0;background:var(--modal);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-box{background:var(--surface);border-radius:10px;width:480px;max-width:92vw;padding:1.4rem 1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.12)}
+.modal-box h2{font-size:1rem;font-weight:600;margin-bottom:.85rem}
+.modal-field{margin-bottom:.75rem}
+.modal-field label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:.2rem;font-weight:500}
+.modal-field input,.modal-field select,.modal-field textarea{width:100%;padding:.45rem .6rem;border:1px solid var(--border2);border-radius:6px;font-size:.875rem;background:var(--input);outline:none;font-family:inherit;color:var(--text)}
+.modal-field input:focus,.modal-field select:focus,.modal-field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(74,108,247,.12);background:var(--input-f)}
+.modal-field textarea{min-height:3.5rem;resize:vertical}
+.modal-actions{display:flex;justify-content:flex-end;gap:.5rem;margin-top:.2rem}
+.set-group{margin-bottom:1rem}
+.set-group label{display:block;font-size:.78rem;color:var(--text2);margin-bottom:.4rem;font-weight:500}
+.set-options{display:flex;gap:.4rem;flex-wrap:wrap}
+.set-opt{padding:.35rem .7rem;border:1px solid var(--border2);border-radius:6px;background:var(--chip);font-size:.82rem;cursor:pointer;color:var(--text);transition:all .12s;user-select:none}
+.set-opt:hover{border-color:var(--text3);background:var(--chip-h)}
+.set-opt.active{border-color:var(--primary);background:var(--primary);color:#fff}
+.lock-screen{position:fixed;inset:0;z-index:200;background:var(--lock-bg);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.lock-screen.open{opacity:1;pointer-events:auto}
+.lock-box{background:var(--surface);border-radius:12px;padding:2.2rem 2rem;width:360px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.1);text-align:center}
+.lock-box .lock-icon{font-size:2.2rem;margin-bottom:.5rem}
+.lock-box h2{font-size:1.1rem;font-weight:600;margin-bottom:.3rem}
+.lock-box .lock-sub{font-size:.85rem;color:var(--text2);margin-bottom:1.2rem}
+.lock-box input[type=password]{width:100%;padding:.6rem .7rem;border:1px solid var(--border2);border-radius:8px;font-size:1rem;background:var(--input);outline:none;text-align:center;transition:border-color .15s;color:var(--text)}
+.lock-box input[type=password]:focus{border-color:var(--primary);background:var(--input-f)}
+.lock-box .lock-error{font-size:.8rem;color:var(--danger);margin-top:.5rem;min-height:1.2rem}
+.lock-box .lock-btn{width:100%;margin-top:.75rem;padding:.6rem;border:none;border-radius:8px;font-size:.9rem;font-weight:500;background:var(--primary);color:#fff;cursor:pointer;transition:background .15s}
+.lock-box .lock-btn:hover{background:var(--primary-h)}
+.lock-box .lock-set-link{display:inline-block;margin-top:.8rem;font-size:.78rem;color:var(--text3);cursor:pointer;text-decoration:underline dotted}
+.lock-box .lock-set-link:hover{color:var(--text2)}
+@media(max-width:680px){.sidebar{width:160px}.main-area{padding:1rem}.form-row input,.form-row select{flex:1 1 100%}}
+</style></head><body><header><h1>&#x1F4D1; 书签管理器</h1>
+<div class="hdr-right" id="hdrRight">
+<span class="stats">共 <span id="totalCount">0</span> 个书签</span>
+<span class="auto-lock-indicator" id="lockIndicator"></span>
+<button class="hdr-btn" id="settingsBtn" title="设置">&#x2699;</button>
+<button class="hdr-btn" id="lockToggle" title="锁定">&#x1F513;</button>
+</div></header>
+<div class="layout" id="appLayout">
+<aside class="sidebar">
+<div class="sidebar-title">分组</div><div id="groupList"></div>
+<div class="sidebar-divider"></div>
+<button class="add-group-btn" id="addGroupBtn">+ 新建分组</button>
+<div class="sidebar-divider"></div>
+<div class="sidebar-title">标签</div>
+<div id="tagSidebarList"></div>
+</aside>
+<main class="main-area">
+<div class="add-card">
+<h2>添加书签</h2>
+<div class="form-row">
+<input type="text" id="inputTitle" placeholder="标题" autocomplete="off">
+<input type="url" id="inputUrl" placeholder="URL (https://...)" autocomplete="off">
+<input type="text" id="inputTags" placeholder="标签，用 # 分隔" autocomplete="off">
+<select id="inputGroup"></select>
+<textarea id="inputDesc" placeholder="简短描述这个网站..." rows="1"></textarea>
+<button class="btn btn-primary" id="btnAdd">添加</button>
+</div></div>
+<div class="filter-bar">
+<input type="text" id="searchInput" placeholder="搜索..." autocomplete="off">
 <div class="tag-filter-group" id="tagFilterGroup"></div>
 <span class="filter-clear" id="clearFilter">清除筛选</span>
 </div>
 <div class="bookmark-list" id="bookmarkList"></div>
-</main>
-</div>
+</main></div>
 <div class="modal-overlay" id="editModal">
 <div class="modal-box">
 <h2>编辑书签</h2>
@@ -16,9 +151,7 @@
 <div class="modal-actions">
 <button class="btn btn-cancel" id="editCancel">取消</button>
 <button class="btn btn-primary" id="editSave">保存</button>
-</div>
-</div>
-</div>
+</div></div></div>
 <div class="modal-overlay" id="pwModal">
 <div class="modal-box">
 <h2 id="pwModalTitle">设置密码</h2>
@@ -29,86 +162,89 @@
 <div class="modal-actions">
 <button class="btn btn-cancel" id="pwCancel">取消</button>
 <button class="btn btn-primary" id="pwSave">保存密码</button>
-</div>
-</div>
-</div>
+</div></div></div>
 <div class="modal-overlay" id="settingsModal">
 <div class="modal-box">
-<h2>⚙️ 设置</h2>
-<div class="set-group"><label>主题</label><div class="set-options" id="themeOptions"><div class="set-opt" data-val="light">☀️ 浅色</div><div class="set-opt" data-val="dark">🌙 深色</div></div></div>
-<div class="set-group"><label>字号</label><div class="set-options" id="fsOptions"><div class="set-opt" data-val="13">A- 小</div><div class="set-opt" data-val="14">A 中</div><div class="set-opt" data-val="16">A+ 大</div></div></div>
+<h2>&#x2699; 设置</h2>
+<div class="set-group"><label>主题</label><div class="set-options" id="themeOptions"><div class="set-opt" data-val="light">&#x2600; 浅色</div><div class="set-opt" data-val="dark">&#x1F319; 深色</div></div></div>
+<div class="set-group"><label>字号</label><div class="set-options" id="fsOptions"><div class="set-opt" data-val="12">12</div><div class="set-opt" data-val="13">13</div><div class="set-opt" data-val="14">14</div><div class="set-opt" data-val="15">15</div><div class="set-opt" data-val="16">16</div><div class="set-opt" data-val="18">18</div><div class="set-opt" data-val="20">20</div></div></div>
 <div class="modal-actions"><button class="btn btn-cancel" id="settingsClose">关闭</button></div>
-</div>
-</div>
+</div></div>
 <div class="lock-screen" id="lockScreen">
 <div class="lock-box">
-<div class="lock-icon">🔒</div>
+<div class="lock-icon">&#x1F512;</div>
 <h2>已锁定</h2>
 <p class="lock-sub">输入密码解锁书签管理器</p>
 <input type="password" id="lockPw" placeholder="输入密码" autocomplete="off">
 <div class="lock-error" id="lockError"></div>
 <button class="lock-btn" id="lockUnlock">解锁</button>
 <span class="lock-set-link" id="lockShowSet">设置密码</span>
-</div>
-</div>
+</div></div>
 <script>
-const SK='codex_bookmarks',GK='codex_groups',HK='codex_lock_hash',TK='codex_theme',FK='codex_fontsize';
-let B=[],G=[],activeTag=null,searchText='',activeGroup='__all__',editingId=null,unlocked=false,autoLockTO=null;
-const AUTO_LOCK_MS=300000;
-/* --- Theme & font size --- */
-function loadTheme(){let t=localStorage.getItem(TK)||'light',f=localStorage.getItem(FK)||'14';document.body.setAttribute('data-theme',t);document.documentElement.style.setProperty('--fs',f+'px');document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===t));document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===f))}
-function setTheme(v){localStorage.setItem(TK,v);document.body.setAttribute('data-theme',v);document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===v))}
-function setFontSize(v){localStorage.setItem(FK,v);document.documentElement.style.setProperty('--fs',v+'px');document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===v))}
-/* --- Settings modal --- */
-function openSettings(){loadTheme();Q('settingsModal').classList.add('open')}
-function closeSettings(){Q('settingsModal').classList.remove('open')}
-/* --- Password hash --- */
-async function hashPW(pw){let enc=new TextEncoder().encode(pw),buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('')}
-function getStoredHash(){try{return localStorage.getItem(HK)||''}catch{return ''}}
-function setStoredHash(h){try{if(h)localStorage.setItem(HK,h);else localStorage.removeItem(HK)}catch{}}
-/* --- Auto-lock --- */
-function startAutoLock(){clearTimeout(autoLockTO);if(unlocked&&getStoredHash()){autoLockTO=setTimeout(()=>{if(unlocked)lock()},AUTO_LOCK_MS);updateLockIndicator()}}
-function stopAutoLock(){clearTimeout(autoLockTO);Q('lockIndicator').textContent='';Q('hdrRight').classList.remove('unlocked')}
-function resetActivity(){if(unlocked&&getStoredHash()){clearTimeout(autoLockTO);autoLockTO=setTimeout(()=>{if(unlocked)lock()},AUTO_LOCK_MS);updateLockIndicator()}}
-function updateLockIndicator(){if(!unlocked||!getStoredHash()){Q('lockIndicator').textContent='';return}Q('hdrRight').classList.add('unlocked')}
-setInterval(()=>{if(unlocked&&getStoredHash()&&autoLockTO){let el=autoLockTO._idleStart||0;let rem=Math.max(0,Math.round((AUTO_LOCK_MS-(Date.now()-el))/1000));if(rem>60)Q('lockIndicator').textContent=Math.floor(rem/60)+'m';else Q('lockIndicator').textContent=rem+'s'}},1000)
-/* --- Lock / unlock --- */
-async function tryUnlock(pw){let h=await hashPW(pw);if(h===getStoredHash()){unlocked=true;Q('lockScreen').classList.remove('open');Q('lockToggle').textContent='🔒';startAutoLock();render();return true}return false}
-function lock(){unlocked=false;stopAutoLock();Q('lockToggle').textContent='🔓';Q('lockScreen').classList.add('open');Q('lockPw').value='';Q('lockError').textContent=''}
-async function initLock(){let h=getStoredHash();if(!h){unlocked=true;Q('lockToggle').textContent='🔒';return}lock();Q('lockPw').focus()}
-/* --- Password settings --- */
-function openPwSettings(){let h=getStoredHash();Q('pwOldField').style.display=h?'block':'none';Q('pwModalTitle').textContent=h?'修改密码':'设置密码';Q('pwHint').textContent=h?'留空新密码并保存可清除密码':'设置一个密码来保护你的书签';Q('pwOld').value='';Q('pwNew').value='';Q('pwConfirm').value='';Q('pwModal').classList.add('open')}
-async function savePwSettings(){let h=getStoredHash();if(h){let o=Q('pwOld').value;if(!o)return alert('请输入当前密码');if((await hashPW(o))!==h)return alert('当前密码错误')}let n=Q('pwNew').value,c=Q('pwConfirm').value;if(n||c){if(n!==c)return alert('两次密码不一致');if(n.length<4)return alert('密码至少 4 位')}let nh=n?await hashPW(n):'';setStoredHash(nh);Q('pwModal').classList.remove('open');if(nh){alert('密码已'+(h?'修改':'设置'))}else{alert('密码已清除')}if(!nh&&!unlocked)unlocked=true;if(!nh){Q('lockScreen').classList.remove('open');Q('lockToggle').textContent='🔒';stopAutoLock();render()}else if(unlocked){startAutoLock()}}
-function closePwSettings(){Q('pwModal').classList.remove('open')}
-/* --- Data --- */
-function ld(){try{B=JSON.parse(localStorage.getItem(SK))||[]}catch{B=[]}try{G=JSON.parse(localStorage.getItem(GK))||[]}catch{G=[]}if(!G.includes('默认'))G.unshift('默认')}
-function sv(){localStorage.setItem(SK,JSON.stringify(B));localStorage.setItem(GK,JSON.stringify(G))}
-function pt(s){return s.split('#').map(t=>t.trim()).filter(t=>t.length)}
-function addB(){let t=Q('inputTitle').value.trim(),u=Q('inputUrl').value.trim(),g=Q('inputGroup').value,ts=pt(Q('inputTags').value),d=Q('inputDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);B.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:t,url:u,tags:ts,group:g,desc:d,createdAt:Date.now()});sv();Q('inputTitle').value='';Q('inputUrl').value='';Q('inputTags').value='';Q('inputDesc').value='';Q('inputTitle').focus();activeGroup=g||'__all__';r()}
-function openEdit(id){let b=B.find(x=>x.id===id);if(!b)return;editingId=id;Q('editTitle').value=b.title;Q('editUrl').value=b.url;Q('editTags').value=b.tags.join(' #');Q('editDesc').value=b.desc||'';let eg=Q('editGroup');eg.innerHTML='';G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;if(g===b.group)o.selected=true;eg.appendChild(o)});Q('editModal').classList.add('open')}
-function saveEdit(){let b=B.find(x=>x.id===editingId);if(!b)return;let t=Q('editTitle').value.trim(),u=Q('editUrl').value.trim(),g=Q('editGroup').value,ts=pt(Q('editTags').value),d=Q('editDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);Object.assign(b,{title:t,url:u,tags:ts,group:g,desc:d});sv();closeEdit();r()}
-function closeEdit(){editingId=null;Q('editModal').classList.remove('open')}
-function delB(id){if(!confirm('删除这个书签？'))return;B=B.filter(b=>b.id!==id);sv();r()}
-function addG(){let n=prompt('输入分组名称：');if(!n||!n.trim())return;n=n.trim();if(G.includes(n))return alert('该分组已存在');G.push(n);sv();activeGroup=n;r()}
-function renG(on){let n=prompt('输入新名称：',on);if(!n||!n.trim()||n.trim()===on)return;n=n.trim();if(G.includes(n))return alert('该名称已存在');let i=G.indexOf(on);if(i===-1)return;G[i]=n;B.forEach(b=>{if(b.group===on)b.group=n});sv();if(activeGroup===on)activeGroup=n;r()}
-function delG(name){if(name==='默认')return alert('不能删除默认分组');let cnt=B.filter(b=>b.group===name).length;if(cnt>0&&!confirm('「'+name+'」中有 '+cnt+' 个书签，移动到「默认」并删除此分组？'))return;G=G.filter(g=>g!==name);B.forEach(b=>{if(b.group===name)b.group='默认'});sv();if(activeGroup===name)activeGroup='__all__';r()}
-function allTags(){let m={};B.forEach(b=>b.tags.forEach(t=>m[t]=(m[t]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1])}
-function filtered(){let l=B.slice();if(activeGroup!=='__all__')l=l.filter(b=>b.group===activeGroup);if(activeTag)l=l.filter(b=>b.tags.includes(activeTag));let q=searchText.trim().toLowerCase();if(q)l=l.filter(b=>b.title.toLowerCase().includes(q)||b.url.toLowerCase().includes(q)||(b.desc||'').toLowerCase().includes(q)||b.tags.some(t=>t.toLowerCase().includes(q)));l.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));return l}
-function Q(i){return document.getElementById(i)}
-function r(){let f=filtered(),ta=allTags();Q('totalCount').textContent=B.length
-let gc=Q('groupList');gc.innerHTML='';function mkG(l,k,c,a){let d=document.createElement('div');d.className='group-item'+(a?' active':'');let ns=document.createElement('span');ns.className='gname';ns.textContent=l;let cs=document.createElement('span');cs.className='gcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{activeGroup=k;if(k!=='__all__')activeTag=null;r()});return d}gc.appendChild(mkG('📂 全部书签','__all__',B.length,activeGroup==='__all__'));G.forEach(n=>{let cnt=B.filter(b=>b.group===n).length,it=mkG('📁 '+n,n,cnt,activeGroup===n);if(n!=='默认'){let a=document.createElement('span');a.className='group-actions';let rb=document.createElement('button');rb.textContent='✎';rb.title='重命名';rb.addEventListener('click',e=>{e.stopPropagation();renG(n)});let db=document.createElement('button');db.textContent='✕';db.title='删除分组';db.className='del-group';db.addEventListener('click',e=>{e.stopPropagation();delG(n)});a.appendChild(rb);a.appendChild(db);it.appendChild(a)}gc.appendChild(it)})
-let tsb=Q('tagSidebarList');tsb.innerHTML='';if(ta.length===0){let e=document.createElement('div');e.style.cssText='padding:.35rem 1rem;font-size:.78rem;color:var(--text3)';e.textContent='暂无标签';tsb.appendChild(e)}else{ta.forEach(([n,c])=>{let d=document.createElement('div');d.className='tag-sb-item'+(n===activeTag?' active':'');let ns=document.createElement('span');ns.textContent='# '+n;let cs=document.createElement('span');cs.className='tcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{activeTag=activeTag===n?null:n;r()});tsb.appendChild(d)})}
-let tc=Q('tagFilterGroup');tc.innerHTML='';ta.forEach(([n,c])=>{let ch=document.createElement('span');ch.className='tag-chip'+(n===activeTag?' active':'');ch.textContent='#'+n+' '+c;ch.addEventListener('click',()=>{activeTag=activeTag===n?null:n;r()});tc.appendChild(ch)})
-let sel=Q('inputGroup');sel.innerHTML='';let eo=document.createElement('option');eo.value='';eo.textContent='（无分组）';sel.appendChild(eo);G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;sel.appendChild(o)});if(activeGroup!=='__all__')sel.value=activeGroup
-let ct=Q('bookmarkList');if(f.length===0){ct.innerHTML='<div class="empty-state">'+(B.length===0?'还没有书签 🎯':'没有匹配的书签')+'</div>';return}ct.innerHTML='';f.forEach(b=>{let it=document.createElement('div');it.className='bookmark-item';let ic=document.createElement('div');ic.className='bookmark-icon';let im=document.createElement('img');let host;try{host=new URL(b.url).hostname}catch{host=''}im.src=host?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=32':'';im.alt='';im.onerror=()=>{ic.innerHTML='🔖'};ic.appendChild(im);let bd=document.createElement('div');bd.className='bookmark-body';let lk=document.createElement('a');lk.className='bookmark-title';lk.href=b.url;lk.target='_blank';lk.rel='noopener noreferrer';lk.textContent=b.title;let ul=document.createElement('div');ul.className='bookmark-url';ul.textContent=b.url+(b.group?' · '+b.group:'');let dd=document.createElement('div');dd.className='bookmark-desc';if(b.desc)dd.textContent=b.desc;let tw=document.createElement('div');tw.className='bookmark-tags';b.tags.forEach(t=>{let tg=document.createElement('span');tg.className='bookmark-tag';tg.textContent='#'+t;tg.addEventListener('click',()=>{activeTag=t;r()});tw.appendChild(tg)});bd.appendChild(lk);bd.appendChild(ul);if(b.desc)bd.appendChild(dd);bd.appendChild(tw);let ac=document.createElement('div');ac.className='bookmark-actions';let eb=document.createElement('button');eb.className='btn btn-ghost';eb.textContent='✎';eb.title='编辑';eb.addEventListener('click',()=>openEdit(b.id));ac.appendChild(eb);let db=document.createElement('button');db.className='btn btn-danger';db.textContent='✕';db.title='删除';db.addEventListener('click',()=>delB(b.id));ac.appendChild(db);it.appendChild(ic);it.appendChild(bd);it.appendChild(ac);ct.appendChild(it)})}
-/* --- Init --- */
-loadTheme();ld();initLock().then(()=>{if(unlocked)r()});async function handleUnlock(){let pw=Q('lockPw').value;if(!pw)return;let ok=await tryUnlock(pw);if(!ok){Q('lockError').textContent='密码错误';Q('lockPw').value='';Q('lockPw').focus()}else{r()}}
-Q('lockUnlock').addEventListener('click',handleUnlock);Q('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')handleUnlock()});Q('lockShowSet').addEventListener('click',()=>{openPwSettings();Q('lockScreen').classList.remove('open')})
-Q('lockToggle').addEventListener('click',()=>{let h=getStoredHash();if(!h){openPwSettings()}else{lock()}})
-Q('settingsBtn').addEventListener('click',openSettings);Q('settingsClose').addEventListener('click',closeSettings);Q('settingsModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeSettings()});document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.addEventListener('click',()=>setTheme(el.dataset.val)));document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.addEventListener('click',()=>setFontSize(el.dataset.val)))
-Q('btnAdd').addEventListener('click',addB);Q('inputTitle').addEventListener('keydown',e=>{if(e.key==='Enter')Q('inputUrl').focus()});Q('inputUrl').addEventListener('keydown',e=>{if(e.key==='Enter')Q('inputTags').focus()});Q('inputTags').addEventListener('keydown',e=>{if(e.key==='Enter')addB()});Q('addGroupBtn').addEventListener('click',addG);Q('editSave').addEventListener('click',saveEdit);Q('editCancel').addEventListener('click',closeEdit);Q('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEdit()});Q('editTitle').addEventListener('keydown',e=>{if(e.key==='Enter')Q('editUrl').focus()});Q('editUrl').addEventListener('keydown',e=>{if(e.key==='Enter')Q('editDesc').focus()});Q('editDesc').addEventListener('keydown',e=>{if(e.key==='Enter')saveEdit()});document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeEdit();closePwSettings();closeSettings()}});Q('searchInput').addEventListener('input',e=>{searchText=e.target.value;r()});Q('clearFilter').addEventListener('click',()=>{activeTag=null;Q('searchInput').value='';searchText='';r()})
-Q('pwSave').addEventListener('click',savePwSettings);Q('pwCancel').addEventListener('click',closePwSettings);Q('pwModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closePwSettings()});Q('pwNew').addEventListener('keydown',e=>{if(e.key==='Enter')Q('pwConfirm').focus()});Q('pwConfirm').addEventListener('keydown',e=>{if(e.key==='Enter')savePwSettings()});
-['mousedown','keydown','touchstart','scroll','wheel'].forEach(ev=>document.addEventListener(ev,resetActivity,{passive:true}));
-</script>
-</body>
-</html>
+const SK={bookmarks:'codex_bookmarks',groups:'codex_groups',lockHash:'codex_lock_hash',theme:'codex_theme',fontSize:'codex_fontsize'};
+const AL=300000;let B=[],G=[],aT=null,sT='',aG='__all__',eId=null,uL=false,aTO=null;const $=id=>document.getElementById(id);
+function ld(){try{B=JSON.parse(localStorage.getItem(SK.bookmarks))||[]}catch{B=[]}try{G=JSON.parse(localStorage.getItem(SK.groups))||[]}catch{G=[]}if(!G.includes('默认'))G.unshift('默认')}
+function sv(){localStorage.setItem(SK.bookmarks,JSON.stringify(B));localStorage.setItem(SK.groups,JSON.stringify(G))}
+function lS(){let t=localStorage.getItem(SK.theme)||'light',f=localStorage.getItem(SK.fontSize)||'14';document.body.setAttribute('data-theme',t);document.documentElement.style.setProperty('--fs',f+'px');document.querySelectorAll('#themeOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===t));document.querySelectorAll('#fsOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===f))}
+function sTv(v){localStorage.setItem(SK.theme,v);document.body.setAttribute('data-theme',v);document.querySelectorAll('#themeOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===v))}
+function sFv(v){localStorage.setItem(SK.fontSize,v);document.documentElement.style.setProperty('--fs',v+'px');document.querySelectorAll('#fsOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===v))}
+async function hPW(pw){let e=new TextEncoder().encode(pw),b=await crypto.subtle.digest('SHA-256',e);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+function gSH(){try{return localStorage.getItem(SK.lockHash)||''}catch{return ''}}
+function sSH(h){try{if(h)localStorage.setItem(SK.lockHash,h);else localStorage.removeItem(SK.lockHash)}catch{}}
+async function tU(pw){if(await hPW(pw)===gSH()){uL=true;$('lockScreen').classList.remove('open');$('lockToggle').textContent='\u{1F512}';sAL();r();return true}return false}
+function lk(){uL=false;cAL();$('lockToggle').textContent='\u{1F513}';$('lockScreen').classList.add('open');$('lockPw').value='';$('lockError').textContent=''}
+async function iL(){let h=gSH();if(!h){uL=true;$('lockToggle').textContent='\u{1F512}';return}lk();$('lockPw').focus()}
+function sAL(){clearTimeout(aTO);if(uL&&gSH()){aTO=setTimeout(()=>{if(uL)lk()},AL)}}
+function cAL(){clearTimeout(aTO);$('lockIndicator').textContent='';$('hdrRight').classList.remove('unlocked')}
+function rA(){if(uL&&gSH()){clearTimeout(aTO);aTO=setTimeout(()=>{if(uL)lk()},AL)}}
+setInterval(()=>{if(uL&&gSH()&&aTO){let s=aTO._idleStart||0,r=Math.max(0,Math.round((AL-(Date.now()-s))/1000));$('lockIndicator').textContent=r>60?Math.floor(r/60)+'m':r+'s'}},1000)
+function oPS(){let h=gSH();$('pwOldField').style.display=h?'block':'none';$('pwModalTitle').textContent=h?'修改密码':'设置密码';$('pwHint').textContent=h?'留空新密码并保存可清除密码':'设置一个密码来保护你的书签';$('pwOld').value='';$('pwNew').value='';$('pwConfirm').value='';$('pwModal').classList.add('open')}
+async function sPS(){let h=gSH();if(h){let o=$('pwOld').value;if(!o)return alert('请输入当前密码');if((await hPW(o))!==h)return alert('当前密码错误')}let n=$('pwNew').value,c=$('pwConfirm').value;if(n||c){if(n!==c)return alert('两次密码不一致');if(n.length<4)return alert('密码至少 4 位')}let nh=n?await hPW(n):'';sSH(nh);$('pwModal').classList.remove('open');if(nh)alert('密码已'+(h?'修改':'设置'));else alert('密码已清除');if(!nh&&!uL)uL=true;if(!nh){$('lockScreen').classList.remove('open');$('lockToggle').textContent='\u{1F512}';cAL();r()}else if(uL){sAL()}}
+function cPS(){$('pwModal').classList.remove('open')}
+function pT(s){return s.split('#').map(t=>t.trim()).filter(t=>t.length)}
+function aB(){let t=$('inputTitle').value.trim(),u=$('inputUrl').value.trim(),g=$('inputGroup').value,ts=pT($('inputTags').value),d=$('inputDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);B.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:t,url:u,tags:ts,group:g,desc:d,createdAt:Date.now()});sv();$('inputTitle').value='';$('inputUrl').value='';$('inputTags').value='';$('inputDesc').value='';$('inputTitle').focus();aG=g||'__all__';r()}
+function oE(id){let b=B.find(x=>x.id===id);if(!b)return;eId=id;$('editTitle').value=b.title;$('editUrl').value=b.url;$('editTags').value=b.tags.join(' # ');$('editDesc').value=b.desc||'';let s=$('editGroup');s.innerHTML='';G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;if(g===b.group)o.selected=true;s.appendChild(o)});$('editModal').classList.add('open')}
+function sE(){let b=B.find(x=>x.id===eId);if(!b)return;let t=$('editTitle').value.trim(),u=$('editUrl').value.trim(),g=$('editGroup').value,ts=pT($('editTags').value),d=$('editDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);Object.assign(b,{title:t,url:u,tags:ts,group:g,desc:d});sv();cE();r()}
+function cE(){eId=null;$('editModal').classList.remove('open')}
+function dB(id){if(!confirm('删除这个书签？'))return;B=B.filter(b=>b.id!==id);sv();r()}
+function aG2(){let n=prompt('输入分组名称：');if(!n||!n.trim())return;n=n.trim();if(G.includes(n))return alert('该分组已存在');G.push(n);sv();aG=n;r()}
+function rG(on){let n=prompt('输入新名称：',on);if(!n||!n.trim()||n.trim()===on)return;n=n.trim();if(G.includes(n))return alert('该名称已存在');let i=G.indexOf(on);if(i===-1)return;G[i]=n;B.forEach(b=>{if(b.group===on)b.group=n});sv();if(aG===on)aG=n;r()}
+function dG(n){if(n==='默认')return alert('不能删除默认分组');let c=B.filter(b=>b.group===n).length;if(c>0&&!confirm('\u300A'+n+'\u300B中有 '+c+' 个书签，移动到「默认」并删除此分组？'))return;G=G.filter(g=>g!==n);B.forEach(b=>{if(b.group===n)b.group='默认'});sv();if(aG===n)aG='__all__';r()}
+function aT2(){let m={};B.forEach(b=>b.tags.forEach(t=>m[t]=(m[t]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1])}
+function gFB(){let l=B.slice();if(aG!=='__all__')l=l.filter(b=>b.group===aG);if(aT)l=l.filter(b=>b.tags.includes(aT));let q=sT.trim().toLowerCase();if(q)l=l.filter(b=>b.title.toLowerCase().includes(q)||b.url.toLowerCase().includes(q)||(b.desc||'').toLowerCase().includes(q)||b.tags.some(t=>t.toLowerCase().includes(q)));l.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));return l}
+function r(){let f=gFB(),ta=aT2();$('totalCount').textContent=B.length
+let gc=$('groupList');gc.innerHTML='';function mGI(l,k,c,a){let d=document.createElement('div');d.className='group-item'+(a?' active':'');let ns=document.createElement('span');ns.className='gname';ns.textContent=l;let cs=document.createElement('span');cs.className='gcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aG=k;if(k!=='__all__')aT=null;r()});return d}gc.appendChild(mGI('\u{1F4C2} 全部书签','__all__',B.length,aG==='__all__'));G.forEach(n=>{let c=B.filter(b=>b.group===n).length,it=mGI('\u{1F4C1} '+n,n,c,aG===n);if(n!=='默认'){let a=document.createElement('span');a.className='group-actions';let rb=document.createElement('button');rb.textContent='\u{270E}';rb.title='重命名';rb.addEventListener('click',e=>{e.stopPropagation();rG(n)});let db=document.createElement('button');db.textContent='\u{2715}';db.title='删除分组';db.className='del-group';db.addEventListener('click',e=>{e.stopPropagation();dG(n)});a.appendChild(rb);a.appendChild(db);it.appendChild(a)}gc.appendChild(it)})
+let tsb=$('tagSidebarList');tsb.innerHTML='';if(ta.length===0){let e=document.createElement('div');e.style.cssText='padding:.35rem 1rem;font-size:.78rem;color:var(--text3)';e.textContent='暂无标签';tsb.appendChild(e)}else{ta.forEach(([n,c])=>{let d=document.createElement('div');d.className='tag-sb-item'+(n===aT?' active':'');let ns=document.createElement('span');ns.textContent='# '+n;let cs=document.createElement('span');cs.className='tcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aT=aT===n?null:n;r()});tsb.appendChild(d)})}
+let tc=$('tagFilterGroup');tc.innerHTML='';ta.forEach(([n,c])=>{let ch=document.createElement('span');ch.className='tag-chip'+(n===aT?' active':'');ch.textContent='#'+n+' '+c;ch.addEventListener('click',()=>{aT=aT===n?null:n;r()});tc.appendChild(ch)})
+let sel=$('inputGroup');sel.innerHTML='';let eo=document.createElement('option');eo.value='';eo.textContent='（无分组）';sel.appendChild(eo);G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;sel.appendChild(o)});if(aG!=='__all__')sel.value=aG
+let ct=$('bookmarkList');if(f.length===0){ct.innerHTML='<div class="empty-state">'+(B.length===0?'还没有书签 \u{1F3AF}':'没有匹配的书签')+'</div>';return}
+ct.innerHTML='';f.forEach(b=>{let it=document.createElement('div');it.className='bookmark-item';let ic=document.createElement('div');ic.className='bookmark-icon';let im=document.createElement('img');let host;try{host=new URL(b.url).hostname}catch{host=''}im.src=host?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=32':'';im.alt='';im.onerror=()=>{ic.innerHTML='\u{1F516}'};ic.appendChild(im);let bd=document.createElement('div');bd.className='bookmark-body';let lk=document.createElement('a');lk.className='bookmark-title';lk.href=b.url;lk.target='_blank';lk.rel='noopener noreferrer';lk.textContent=b.title;let ul=document.createElement('div');ul.className='bookmark-url';ul.textContent=b.url+(b.group?' - '+b.group:'');let dd=document.createElement('div');dd.className='bookmark-desc';if(b.desc)dd.textContent=b.desc;let tw=document.createElement('div');tw.className='bookmark-tags';b.tags.forEach(t=>{let tg=document.createElement('span');tg.className='bookmark-tag';tg.textContent='#'+t;tg.addEventListener('click',()=>{aT=t;r()});tw.appendChild(tg)});bd.appendChild(lk);bd.appendChild(ul);if(b.desc)bd.appendChild(dd);bd.appendChild(tw);let ac=document.createElement('div');ac.className='bookmark-actions';let eb=document.createElement('button');eb.className='btn btn-ghost';eb.textContent='\u{270E}';eb.title='编辑';eb.addEventListener('click',()=>oE(b.id));ac.appendChild(eb);let db=document.createElement('button');db.className='btn btn-danger';db.textContent='\u{2715}';db.title='删除';db.addEventListener('click',()=>dB(b.id));ac.appendChild(db);it.appendChild(ic);it.appendChild(bd);it.appendChild(ac);ct.appendChild(it)})}
+ld();lS();iL().then(()=>{if(uL)r()});
+$('lockUnlock').addEventListener('click',async()=>{let p=$('lockPw').value;if(!p)return;if(await tU(p))r();else{$('lockError').textContent='密码错误';$('lockPw').value='';$('lockPw').focus()}});
+$('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')$('lockUnlock').click()});
+$('lockShowSet').addEventListener('click',()=>{oPS();$('lockScreen').classList.remove('open')});
+$('lockToggle').addEventListener('click',()=>{gSH()?lk():oPS()});
+$('settingsBtn').addEventListener('click',()=>{lS();$('settingsModal').classList.add('open')});
+$('settingsClose').addEventListener('click',()=>$('settingsModal').classList.remove('open'));
+$('settingsModal').addEventListener('click',e=>{if(e.target===e.currentTarget)$('settingsModal').classList.remove('open')});
+document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.addEventListener('click',()=>sTv(el.dataset.val)));
+document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.addEventListener('click',()=>sFv(el.dataset.val)));
+$('btnAdd').addEventListener('click',aB);
+$('inputTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputUrl').focus()});
+$('inputUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputTags').focus()});
+$('inputTags').addEventListener('keydown',e=>{if(e.key==='Enter')aB()});
+$('addGroupBtn').addEventListener('click',aG2);
+$('editSave').addEventListener('click',sE);$('editCancel').addEventListener('click',cE);
+$('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)cE()});
+$('editTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('editUrl').focus()});
+$('editUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('editDesc').focus()});
+$('editDesc').addEventListener('keydown',e=>{if(e.key==='Enter')sE()});
+$('pwSave').addEventListener('click',sPS);$('pwCancel').addEventListener('click',cPS);
+$('pwModal').addEventListener('click',e=>{if(e.target===e.currentTarget)cPS()});
+$('pwNew').addEventListener('keydown',e=>{if(e.key==='Enter')$('pwConfirm').focus()});
+$('pwConfirm').addEventListener('keydown',e=>{if(e.key==='Enter')sPS()});
+$('searchInput').addEventListener('input',e=>{sT=e.target.value;r()});
+$('clearFilter').addEventListener('click',()=>{aT=null;$('searchInput').value='';sT='';r()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){cE();cPS();$('settingsModal').classList.remove('open')}});
+['mousedown','keydown','touchstart','scroll','wheel'].forEach(ev=>document.addEventListener(ev,rA,{passive:true}));
+</script></body></html>
