@@ -1,14 +1,30 @@
 
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>书签管理器</title>
-<style>:root{--bg:#f5f6f8;--surface:#fff;--text:#1a1a2e;--text2:#6b6f8a;--text3:#9ca1b7;--border:#e4e6eb;--border2:#d0d3dd;--primary:#4a6cf7;--primary-h:#3b5de7;--danger:#e34f4f;--danger-bg:#fef0f0;--hover:#f5f6f8;--active:#eef1fe;--tag:#eef0f6;--tag-h:#dfe2ee;--tag-t:#4a4d67;--chip:#f5f6f8;--chip-h:#edeff5;--modal:rgba(0,0,0,.3);--input:#fafafa;--input-f:#fff;--lock-bg:#f5f6f8;--scroll:#d0d3dd;--fs:14px}
-[data-theme=dark]{--bg:#13142a;--surface:#1e1f3a;--text:#e4e6eb;--text2:#9ca1b7;--text3:#6b6f8a;--border:#2d2f4a;--border2:#3a3c58;--primary:#6b8aff;--primary-h:#5a7af0;--danger:#f06a6a;--danger-bg:#3a1e28;--hover:#262842;--active:#1a1c36;--tag:#2d2f4a;--tag-h:#3a3c58;--tag-t:#c4c6d8;--chip:#262842;--chip-h:#2d2f4a;--modal:rgba(0,0,0,.55);--input:#262842;--input-f:#2d2f4a;--lock-bg:#13142a;--scroll:#3a3c58}
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>书签管理器</title>
+<style>
+:root{--bg:#f5f6f8;--surface:#fff;--text:#1a1a2e;--text2:#6b6f8a;--text3:#9ca1b7;--border:#e4e6eb;--border2:#d0d3dd;--primary:#4a6cf7;--primary-h:#3b5de7;--success:#22c55e;--danger:#e34f4f;--danger-bg:#fef0f0;--hover:#f5f6f8;--active:#eef1fe;--tag:#eef0f6;--tag-h:#dfe2ee;--tag-t:#4a4d67;--chip:#f5f6f8;--chip-h:#edeff5;--modal:rgba(0,0,0,.3);--input:#fafafa;--input-f:#fff;--lock-bg:#f5f6f8;--scroll:#d0d3dd;--fs:14px}
+[data-theme=dark]{--bg:#13142a;--surface:#1e1f3a;--text:#e4e6eb;--text2:#9ca1b7;--text3:#6b6f8a;--border:#2d2f4a;--border2:#3a3c58;--primary:#6b8aff;--primary-h:#5a7af0;--success:#4ade80;--danger:#f06a6a;--danger-bg:#3a1e28;--hover:#262842;--active:#1a1c36;--tag:#2d2f4a;--tag-h:#3a3c58;--tag-t:#c4c6d8;--chip:#262842;--chip-h:#2d2f4a;--modal:rgba(0,0,0,.55);--input:#262842;--input-f:#2d2f4a;--lock-bg:#13142a;--scroll:#3a3c58}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:var(--fs)}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+.auth-screen{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.auth-box{background:var(--surface);border-radius:14px;padding:2.5rem 2rem;width:400px;max-width:92vw;box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center}
+.auth-box .logo{font-size:2.5rem;margin-bottom:.5rem}
+.auth-box h1{font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.auth-box .sub{font-size:.85rem;color:var(--text2);margin-bottom:1.5rem}
+.auth-box input[type=email],.auth-box input[type=password],.auth-box input[type=text]{width:100%;padding:.6rem .7rem;border:1px solid var(--border2);border-radius:8px;font-size:.9rem;background:var(--input);outline:none;color:var(--text);margin-bottom:.6rem;transition:border-color .15s}
+.auth-box input:focus{border-color:var(--primary);background:var(--input-f)}
+.auth-box .auth-btn{width:100%;padding:.6rem;border:none;border-radius:8px;font-size:.9rem;font-weight:500;background:var(--primary);color:#fff;cursor:pointer;transition:background .15s;margin-top:.4rem}
+.auth-box .auth-btn:hover{background:var(--primary-h)}
+.auth-box .auth-link{display:inline-block;margin-top:.75rem;font-size:.82rem;color:var(--text3);cursor:pointer;text-decoration:underline dotted}
+.auth-box .auth-link:hover{color:var(--text2)}
+.auth-box .auth-error{font-size:.8rem;color:var(--danger);margin-top:.4rem;min-height:1.2rem}
+.auth-box .auth-code{font-size:1.5rem;font-weight:700;letter-spacing:.3em;color:var(--primary);padding:.5rem;background:var(--active);border-radius:8px;margin:.5rem 0}
+.auth-box .auth-hint{font-size:.75rem;color:var(--text3);margin-top:.3rem}
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 header h1{font-size:1.15rem;font-weight:600}
 .hdr-right{display:flex;align-items:center;gap:.6rem}
@@ -16,6 +32,7 @@ header h1{font-size:1.15rem;font-weight:600}
 .hdr-right .stats span{font-weight:600;color:var(--text)}
 .hdr-btn{background:none;border:none;font-size:1.1rem;cursor:pointer;padding:.15rem .3rem;border-radius:4px;line-height:1;transition:background .12s;color:var(--text2)}
 .hdr-btn:hover{background:var(--hover);color:var(--text)}
+.hdr-user{font-size:.78rem;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .auto-lock-indicator{font-size:.72rem;color:var(--text3);margin-left:.1rem;display:none}
 .hdr-right.unlocked .auto-lock-indicator{display:inline}
 .layout{display:flex;flex:1;min-height:0}
@@ -92,6 +109,7 @@ header h1{font-size:1.15rem;font-weight:600}
 .set-opt{padding:.35rem .7rem;border:1px solid var(--border2);border-radius:6px;background:var(--chip);font-size:.82rem;cursor:pointer;color:var(--text);transition:all .12s;user-select:none}
 .set-opt:hover{border-color:var(--text3);background:var(--chip-h)}
 .set-opt.active{border-color:var(--primary);background:var(--primary);color:#fff}
+.lang-label{font-size:.72rem;color:var(--text3);display:inline;margin:0 .2rem;vertical-align:middle}
 .lock-screen{position:fixed;inset:0;z-index:200;background:var(--lock-bg);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .lock-screen.open{opacity:1;pointer-events:auto}
 .lock-box{background:var(--surface);border-radius:12px;padding:2.2rem 2rem;width:360px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.1);text-align:center}
@@ -103,148 +121,279 @@ header h1{font-size:1.15rem;font-weight:600}
 .lock-box .lock-error{font-size:.8rem;color:var(--danger);margin-top:.5rem;min-height:1.2rem}
 .lock-box .lock-btn{width:100%;margin-top:.75rem;padding:.6rem;border:none;border-radius:8px;font-size:.9rem;font-weight:500;background:var(--primary);color:#fff;cursor:pointer;transition:background .15s}
 .lock-box .lock-btn:hover{background:var(--primary-h)}
-.lock-box .lock-set-link{display:inline-block;margin-top:.8rem;font-size:.78rem;color:var(--text3);cursor:pointer;text-decoration:underline dotted}
-.lock-box .lock-set-link:hover{color:var(--text2)}
 @media(max-width:680px){.sidebar{width:160px}.main-area{padding:1rem}.form-row input,.form-row select{flex:1 1 100%}}
-</style></head><body><header><h1>&#x1F4D1; 书签管理器</h1>
+</style></head><body><div class="auth-screen" id="authScreen">
+<div class="auth-box" id="loginForm" style="">
+<div class="logo">&#x1F4D1;</div>
+<h1 data-i18n="appTitle">书签管理器</h1>
+<div class="sub" data-i18n="loginTitle">登录你的账户</div>
+<input type="email" id="loginEmail" data-i18n-placeholder="emailPH" placeholder="邮箱地址" autocomplete="email">
+<input type="password" id="loginPw" data-i18n-placeholder="pwPH" placeholder="密码" autocomplete="current-password">
+<div class="auth-error" id="loginError"></div>
+<button class="auth-btn" id="loginBtn" data-i18n="loginBtn">登录</button>
+<div><span class="auth-link" id="showRegister" data-i18n="noAccount">没有账户？注册</span></div>
+<div><span class="auth-link" id="showForgot" data-i18n="forgotPw">忘记密码？</span></div>
+</div>
+<div class="auth-box" id="registerForm" style="display:none">
+<div class="logo">&#x1F4D1;</div>
+<h1 data-i18n="regTitle">注册账户</h1>
+<div class="sub" data-i18n="regSub">创建你的书签账户</div>
+<input type="email" id="regEmail" data-i18n-placeholder="emailPH" placeholder="邮箱地址" autocomplete="email">
+<input type="password" id="regPw" data-i18n-placeholder="pwRegPH" placeholder="密码 (至少6位)" autocomplete="new-password">
+<input type="password" id="regPw2" data-i18n-placeholder="pwConfirmPH" placeholder="确认密码" autocomplete="new-password">
+<div class="auth-error" id="regError"></div>
+<button class="auth-btn" id="regBtn" data-i18n="regBtn">注册</button>
+<div><span class="auth-link" id="showLogin" data-i18n="hasAccount">已有账户？登录</span></div>
+</div>
+<div class="auth-box" id="verifyForm" style="display:none">
+<div class="logo">&#x2709;</div>
+<h1 data-i18n="verifyTitle">验证邮箱</h1>
+<div class="sub" data-i18n="verifySub">验证码显示在下方</div>
+<div class="auth-code" id="verifyCodeDisplay">000000</div>
+<div class="auth-hint" data-i18n="verifyHint">请输入上方验证码完成注册</div>
+<input type="text" id="verifyInput" placeholder="000000" autocomplete="off" style="text-align:center;letter-spacing:.3em;font-size:1.2rem">
+<div class="auth-error" id="verifyError"></div>
+<button class="auth-btn" id="verifyBtn" data-i18n="verifyBtn">验证</button>
+</div>
+<div class="auth-box" id="forgotForm" style="display:none">
+<div class="logo">&#x1F512;</div>
+<h1 data-i18n="forgotTitle">重置密码</h1>
+<div class="sub" data-i18n="forgotSub">验证码会显示在下方</div>
+<input type="email" id="forgotEmail" data-i18n-placeholder="emailPH" placeholder="输入注册邮箱" autocomplete="email">
+<div class="auth-code" id="forgotCodeDisplay" style="display:none">000000</div>
+<div class="auth-hint" id="forgotHint" style="display:none" data-i18n="forgotHint">请输入验证码并设置新密码</div>
+<input type="text" id="forgotCode" placeholder="000000" autocomplete="off" style="display:none;text-align:center;letter-spacing:.3em">
+<input type="password" id="forgotNewPw" data-i18n-placeholder="newPwPH" placeholder="新密码" style="display:none">
+<input type="password" id="forgotNewPw2" data-i18n-placeholder="pwConfirmPH" placeholder="确认新密码" style="display:none">
+<div class="auth-error" id="forgotError"></div>
+<button class="auth-btn" id="forgotBtn" data-i18n="forgotSend">发送验证码</button>
+<div><span class="auth-link" id="backToLogin" data-i18n="backLogin">返回登录</span></div>
+</div></div>
+<header><h1 data-i18n="appTitle">书签管理器</h1>
 <div class="hdr-right" id="hdrRight">
-<span class="stats">共 <span id="totalCount">0</span> 个书签</span>
+<span class="hdr-user" id="hdrUser"></span>
+<span class="stats"><span data-i18n="stats">共</span> <span id="totalCount">0</span> <span data-i18n="stats2">个书签</span></span>
 <span class="auto-lock-indicator" id="lockIndicator"></span>
-<button class="hdr-btn" id="settingsBtn" title="设置">&#x2699;</button>
-<button class="hdr-btn" id="lockToggle" title="锁定">&#x1F513;</button>
+<button class="hdr-btn" id="logoutBtn" title="Logout">&#x1F6AA;</button>
+<button class="hdr-btn" id="settingsBtn" title="Settings">&#x2699;</button>
+<button class="hdr-btn" id="lockToggle" title="Lock">&#x1F513;</button>
 </div></header>
-<div class="layout" id="appLayout">
-<aside class="sidebar">
-<div class="sidebar-title">分组</div><div id="groupList"></div>
+<div class="layout"><aside class="sidebar">
+<div class="sidebar-title" data-i18n="groups">分组</div>
+<div id="groupList"></div>
 <div class="sidebar-divider"></div>
-<button class="add-group-btn" id="addGroupBtn">+ 新建分组</button>
+<button class="add-group-btn" id="addGroupBtn"><span data-i18n="newGroup">+ 新建分组</span></button>
 <div class="sidebar-divider"></div>
-<div class="sidebar-title">标签</div>
+<div class="sidebar-title" data-i18n="tags">标签</div>
 <div id="tagSidebarList"></div>
 </aside>
 <main class="main-area">
 <div class="add-card">
-<h2>添加书签</h2>
+<h2 data-i18n="addTitle">添加书签</h2>
 <div class="form-row">
-<input type="text" id="inputTitle" placeholder="标题" autocomplete="off">
-<input type="url" id="inputUrl" placeholder="URL (https://...)" autocomplete="off">
-<input type="text" id="inputTags" placeholder="标签，用 # 分隔" autocomplete="off">
+<input type="text" id="inputTitle" data-i18n-placeholder="titlePH" placeholder="标题" autocomplete="off">
+<input type="url" id="inputUrl" placeholder="URL" autocomplete="off">
+<input type="text" id="inputTags" data-i18n-placeholder="tagsPH" placeholder="标签，用 # 分隔" autocomplete="off">
 <select id="inputGroup"></select>
-<textarea id="inputDesc" placeholder="简短描述这个网站..." rows="1"></textarea>
-<button class="btn btn-primary" id="btnAdd">添加</button>
+<textarea id="inputDesc" data-i18n-placeholder="descPH" placeholder="简短描述..." rows="1"></textarea>
+<button class="btn btn-primary" id="btnAdd" data-i18n="addBtn">添加</button>
 </div></div>
 <div class="filter-bar">
-<input type="text" id="searchInput" placeholder="搜索..." autocomplete="off">
+<input type="text" id="searchInput" data-i18n-placeholder="searchPH" placeholder="搜索..." autocomplete="off">
 <div class="tag-filter-group" id="tagFilterGroup"></div>
-<span class="filter-clear" id="clearFilter">清除筛选</span>
+<span class="filter-clear" id="clearFilter" data-i18n="clearFilter">清除筛选</span>
 </div>
 <div class="bookmark-list" id="bookmarkList"></div>
 </main></div>
 <div class="modal-overlay" id="editModal">
 <div class="modal-box">
-<h2>编辑书签</h2>
-<div class="modal-field"><label>标题</label><input type="text" id="editTitle"></div>
+<h2 data-i18n="editTitle">编辑书签</h2>
+<div class="modal-field"><label data-i18n="titleLabel">标题</label><input type="text" id="editTitle"></div>
 <div class="modal-field"><label>URL</label><input type="url" id="editUrl"></div>
-<div class="modal-field"><label>标签（用 # 分隔）</label><input type="text" id="editTags"></div>
-<div class="modal-field"><label>分组</label><select id="editGroup"></select></div>
-<div class="modal-field"><label>描述</label><textarea id="editDesc" rows="2"></textarea></div>
+<div class="modal-field"><label data-i18n="tagsLabel">标签</label><input type="text" id="editTags"></div>
+<div class="modal-field"><label data-i18n="groupLabel">分组</label><select id="editGroup"></select></div>
+<div class="modal-field"><label data-i18n="descLabel">描述</label><textarea id="editDesc" rows="2"></textarea></div>
 <div class="modal-actions">
-<button class="btn btn-cancel" id="editCancel">取消</button>
-<button class="btn btn-primary" id="editSave">保存</button>
-</div></div></div>
-<div class="modal-overlay" id="pwModal">
-<div class="modal-box">
-<h2 id="pwModalTitle">设置密码</h2>
-<div class="modal-field" id="pwOldField"><label>当前密码</label><input type="password" id="pwOld"></div>
-<div class="modal-field"><label>新密码</label><input type="password" id="pwNew"></div>
-<div class="modal-field"><label>确认新密码</label><input type="password" id="pwConfirm"></div>
-<div style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem" id="pwHint"></div>
-<div class="modal-actions">
-<button class="btn btn-cancel" id="pwCancel">取消</button>
-<button class="btn btn-primary" id="pwSave">保存密码</button>
+<button class="btn btn-cancel" id="editCancel" data-i18n="cancel">取消</button>
+<button class="btn btn-primary" id="editSave" data-i18n="save">保存</button>
 </div></div></div>
 <div class="modal-overlay" id="settingsModal">
 <div class="modal-box">
-<h2>&#x2699; 设置</h2>
-<div class="set-group"><label>主题</label><div class="set-options" id="themeOptions"><div class="set-opt" data-val="light">&#x2600; 浅色</div><div class="set-opt" data-val="dark">&#x1F319; 深色</div></div></div>
-<div class="set-group"><label>字号</label><div class="set-options" id="fsOptions"><div class="set-opt" data-val="12">12</div><div class="set-opt" data-val="13">13</div><div class="set-opt" data-val="14">14</div><div class="set-opt" data-val="15">15</div><div class="set-opt" data-val="16">16</div><div class="set-opt" data-val="18">18</div><div class="set-opt" data-val="20">20</div></div></div>
-<div class="modal-actions"><button class="btn btn-cancel" id="settingsClose">关闭</button></div>
+<h2 data-i18n="settingsTitle">&#x2699; 设置</h2>
+<div class="set-group"><label data-i18n="theme">主题</label>
+<div class="set-options" id="themeOptions">
+<div class="set-opt" data-val="light">&#x2600; <span data-i18n="light">浅色</span></div>
+<div class="set-opt" data-val="dark">&#x1F319; <span data-i18n="dark">深色</span></div>
+</div></div>
+<div class="set-group"><label data-i18n="fontSize">字号</label>
+<div class="set-options" id="fsOptions">
+<div class="set-opt" data-val="12">12</div><div class="set-opt" data-val="13">13</div><div class="set-opt" data-val="14">14</div><div class="set-opt" data-val="15">15</div><div class="set-opt" data-val="16">16</div><div class="set-opt" data-val="18">18</div><div class="set-opt" data-val="20">20</div>
+</div></div>
+<div class="set-group"><label data-i18n="language">语言</label>
+<div class="set-options" id="langOptions">
+<div class="set-opt" data-val="zh">&#x1F1E8;&#x1F1F3; <span class="lang-label">ZH</span></div>
+<div class="set-opt" data-val="en">&#x1F1EC;&#x1F1E7; <span class="lang-label">EN</span></div>
+</div></div>
+<div class="set-group"><label data-i18n="account">账户</label>
+<div style="font-size:.82rem;color:var(--text2);margin-bottom:.4rem" id="settingsAccount"></div>
+</div>
+<div class="modal-actions"><button class="btn btn-cancel" id="settingsClose" data-i18n="close">关闭</button></div>
 </div></div>
 <div class="lock-screen" id="lockScreen">
 <div class="lock-box">
 <div class="lock-icon">&#x1F512;</div>
-<h2>已锁定</h2>
-<p class="lock-sub">输入密码解锁书签管理器</p>
-<input type="password" id="lockPw" placeholder="输入密码" autocomplete="off">
+<h2 data-i18n="lockTitle">已锁定</h2>
+<p class="lock-sub" data-i18n="lockSub">输入密码解锁</p>
+<input type="password" id="lockPw" data-i18n-placeholder="lockPH" placeholder="账户密码" autocomplete="off">
 <div class="lock-error" id="lockError"></div>
-<button class="lock-btn" id="lockUnlock">解锁</button>
-<span class="lock-set-link" id="lockShowSet">设置密码</span>
+<button class="lock-btn" id="lockBtn" data-i18n="lockBtn">解锁</button>
 </div></div>
 <script>
-const SK={bookmarks:'codex_bookmarks',groups:'codex_groups',lockHash:'codex_lock_hash',theme:'codex_theme',fontSize:'codex_fontsize'};
-const AL=300000;let B=[],G=[],aT=null,sT='',aG='__all__',eId=null,uL=false,aTO=null;const $=id=>document.getElementById(id);
-function ld(){try{B=JSON.parse(localStorage.getItem(SK.bookmarks))||[]}catch{B=[]}try{G=JSON.parse(localStorage.getItem(SK.groups))||[]}catch{G=[]}if(!G.includes('默认'))G.unshift('默认')}
-function sv(){localStorage.setItem(SK.bookmarks,JSON.stringify(B));localStorage.setItem(SK.groups,JSON.stringify(G))}
-function lS(){let t=localStorage.getItem(SK.theme)||'light',f=localStorage.getItem(SK.fontSize)||'14';document.body.setAttribute('data-theme',t);document.documentElement.style.setProperty('--fs',f+'px');document.querySelectorAll('#themeOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===t));document.querySelectorAll('#fsOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===f))}
-function sTv(v){localStorage.setItem(SK.theme,v);document.body.setAttribute('data-theme',v);document.querySelectorAll('#themeOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===v))}
-function sFv(v){localStorage.setItem(SK.fontSize,v);document.documentElement.style.setProperty('--fs',v+'px');document.querySelectorAll('#fsOptions .set-opt').forEach(e=>e.classList.toggle('active',e.dataset.val===v))}
-async function hPW(pw){let e=new TextEncoder().encode(pw),b=await crypto.subtle.digest('SHA-256',e);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
-function gSH(){try{return localStorage.getItem(SK.lockHash)||''}catch{return ''}}
-function sSH(h){try{if(h)localStorage.setItem(SK.lockHash,h);else localStorage.removeItem(SK.lockHash)}catch{}}
-async function tU(pw){if(await hPW(pw)===gSH()){uL=true;$('lockScreen').classList.remove('open');$('lockToggle').textContent='\u{1F512}';sAL();r();return true}return false}
-function lk(){uL=false;cAL();$('lockToggle').textContent='\u{1F513}';$('lockScreen').classList.add('open');$('lockPw').value='';$('lockError').textContent=''}
-async function iL(){let h=gSH();if(!h){uL=true;$('lockToggle').textContent='\u{1F512}';return}lk();$('lockPw').focus()}
-function sAL(){clearTimeout(aTO);if(uL&&gSH()){aTO=setTimeout(()=>{if(uL)lk()},AL)}}
+const AK='codex_accounts',SK='codex_session',TK='codex_theme',FK='codex_fontsize',LK='codex_lang';
+const AL=300000;let B=[],G=[],aT=null,sT='',aG='__all__',eId=null,uL=false,aTO=null,curUser=null,pCodes={};
+const $=id=>document.getElementById(id);
+
+/* ===== i18n ===== */
+const L={zh:{
+appTitle:'书签管理器',loginTitle:'登录你的账户',loginBtn:'登录',noAccount:'没有账户？注册',forgotPw:'忘记密码？',
+regTitle:'注册账户',regSub:'创建你的书签账户',regBtn:'注册',hasAccount:'已有账户？登录',
+verifyTitle:'验证邮箱',verifySub:'验证码显示在下方',verifyHint:'请输入上方验证码完成注册',verifyBtn:'验证',
+forgotTitle:'重置密码',forgotSub:'验证码会显示在下方',forgotHint:'请输入验证码并设置新密码',forgotSend:'发送验证码',backLogin:'返回登录',
+lockTitle:'已锁定',lockSub:'输入密码解锁',lockPH:'账户密码',lockBtn:'解锁',
+addTitle:'添加书签',titlePH:'标题',tagsPH:'标签，用 # 分隔',descPH:'简短描述...',addBtn:'添加',
+searchPH:'搜索...',clearFilter:'清除筛选',groups:'分组',tags:'标签',newGroup:'+ 新建分组',
+editTitle:'编辑书签',titleLabel:'标题',tagsLabel:'标签',groupLabel:'分组',descLabel:'描述',
+cancel:'取消',save:'保存',close:'关闭',
+settingsTitle:'设置',theme:'主题',light:'浅色',dark:'深色',fontSize:'字号',language:'语言',
+loginPH:'登录',register:'注册',forgot:'忘记密码',emailPH:'邮箱地址',
+pwPH:'密码',pwRegPH:'密码 (至少6位)',pwConfirmPH:'确认密码',newPwPH:'新密码',
+account:'账户',
+noGroup:'（无分组）',allStd:'全部书签',noTags:'暂无标签',
+stats:'共',stats2:'个书签'
+},en:{
+appTitle:'Bookmark Manager',loginTitle:'Login to your account',loginBtn:'Login',noAccount:'No account? Register',forgotPw:'Forgot password?',
+regTitle:'Create Account',regSub:'Create your bookmark account',regBtn:'Register',hasAccount:'Already have an account? Login',
+verifyTitle:'Verify Email',verifySub:'Verification code shown below',verifyHint:'Enter the code to complete registration',verifyBtn:'Verify',
+forgotTitle:'Reset Password',forgotSub:'Verification code shown below',forgotHint:'Enter code and set new password',forgotSend:'Send Code',backLogin:'Back to Login',
+lockTitle:'Locked',lockSub:'Enter password to unlock',lockPH:'Account password',lockBtn:'Unlock',
+addTitle:'Add Bookmark',titlePH:'Title',tagsPH:'Tags, use #',descPH:'Brief description...',addBtn:'Add',
+searchPH:'Search...',clearFilter:'Clear Filter',groups:'Groups',tags:'Tags',newGroup:'+ New Group',
+editTitle:'Edit Bookmark',titleLabel:'Title',tagsLabel:'Tags',groupLabel:'Group',descLabel:'Description',
+cancel:'Cancel',save:'Save',close:'Close',
+settingsTitle:'Settings',theme:'Theme',light:'Light',dark:'Dark',fontSize:'Font Size',language:'Language',
+loginPH:'Login',register:'Register',forgot:'Forgot',emailPH:'Email address',
+pwPH:'Password',pwRegPH:'Password (min 6 chars)',pwConfirmPH:'Confirm password',newPwPH:'New password',
+account:'Account',
+noGroup:'(No group)',allStd:'All Bookmarks',noTags:'No tags yet',
+stats:'',stats2:'bookmarks'
+}};
+let lang=localStorage.getItem(LK)||'zh';
+function _(k){let t=L[lang][k];return t!==undefined?t:k}
+function applyLang(){
+document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=_(el.dataset.i18n)});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=_(el.dataset.i18nPlaceholder)});
+document.title=lang==='en'?'Bookmark Manager':'书签管理器';
+document.querySelectorAll('#langOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===lang));
+document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===(localStorage.getItem(TK)||'light')));
+let f=localStorage.getItem(FK)||'14';document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.classList.toggle('active',el.dataset.val===f));
+}
+
+/* ===== Crypto ===== */
+async function hPW(pw){try{let e=new TextEncoder().encode(pw),b=await crypto.subtle.digest('SHA-256',e);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}catch{return btoa(pw)}}
+
+/* ===== Accounts ===== */
+function gA(){try{return JSON.parse(localStorage.getItem(AK))||{}}catch{return{}}}
+function sA(a){localStorage.setItem(AK,JSON.stringify(a))}
+function gS(){try{return JSON.parse(localStorage.getItem(SK))||{}}catch{return{}}}
+function sS(s){localStorage.setItem(SK,JSON.stringify(s))}
+function cS(){localStorage.removeItem(SK)}
+function lUD(e){let a=gA(),u=a[e];if(!u)return;curUser=e;try{B=JSON.parse(localStorage.getItem('bm_'+e)||'[]')}catch{B=[]}try{G=JSON.parse(localStorage.getItem('bg_'+e)||'[]')}catch{G=[]}if(!G.includes('默认'))G.unshift('默认')}
+function sUD(){if(!curUser)return;localStorage.setItem('bm_'+curUser,JSON.stringify(B));localStorage.setItem('bg_'+curUser,JSON.stringify(G))}
+
+/* ===== Auth UI ===== */
+function sF(id){
+['loginForm','registerForm','verifyForm','forgotForm'].forEach(f=>{$('authScreen').querySelectorAll('#'+f)[0].style.display=f===id?'':'none'});
+applyLang();
+if(id==='loginForm'){$('loginEmail').focus();$('loginError').textContent='';$('loginEmail').placeholder=_('emailPH');$('loginPw').placeholder=_('pwPH')}
+else if(id==='registerForm'){$('regEmail').focus();$('regError').textContent='';$('regEmail').placeholder=_('emailPH');$('regPw').placeholder=_('pwRegPH');$('regPw2').placeholder=_('pwConfirmPH')}
+else if(id==='verifyForm'){$('verifyInput').value='';$('verifyInput').focus();$('verifyError').textContent=''}
+else if(id==='forgotForm'){$('forgotEmail').value='';$('forgotCode').style.display='none';$('forgotNewPw').style.display='none';$('forgotNewPw2').style.display='none';$('forgotCodeDisplay').style.display='none';$('forgotHint').style.display='none';$('forgotBtn').textContent=_('forgotSend');$('forgotError').textContent='';$('forgotEmail').placeholder=_('emailPH')}
+}
+async function hReg(){let e=$('regEmail').value.trim().toLowerCase(),p=$('regPw').value,p2=$('regPw2').value;if(!e)return($('regError').textContent=lang==='en'?'Please enter email':'请输入邮箱');if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))return($('regError').textContent=lang==='en'?'Invalid email':'邮箱格式不正确');if(!p||p.length<6)return($('regError').textContent=lang==='en'?'Password must be at least 6 characters':'密码至少6位');if(p!==p2)return($('regError').textContent=lang==='en'?'Passwords do not match':'两次密码不一致');let a=gA();if(a[e])return($('regError').textContent=lang==='en'?'Email already registered':'该邮箱已注册');let c=Math.floor(100000+Math.random()*900000).toString();pCodes[e]=c;$('verifyCodeDisplay').textContent=c;sF('verifyForm');$('verifyForm').dataset.email=e;$('verifyForm').dataset.pw=p;$('verifyForm').dataset.code=c}
+function hVer(){let e=$('verifyForm').dataset.email,p=$('verifyForm').dataset.pw,i=$('verifyInput').value.trim();if(i!==$('verifyForm').dataset.code)return($('verifyError').textContent=lang==='en'?'Invalid code':'验证码错误');let a=gA();hPW(p).then(h=>{a[e]={pw:h,created:Date.now()};sA(a);delete pCodes[e];let oB=[],oG=[];try{oB=JSON.parse(localStorage.getItem('codex_bookmarks')||'[]')}catch{}try{oG=JSON.parse(localStorage.getItem('codex_groups')||'[]')}catch{}if(oB.length>0){localStorage.setItem('bm_'+e,JSON.stringify(oB));localStorage.setItem('bg_'+e,JSON.stringify(oG));localStorage.removeItem('codex_bookmarks');localStorage.removeItem('codex_groups')}sS({email:e,loginTime:Date.now()});lU(e)})}
+async function hLog(){let e=$('loginEmail').value.trim().toLowerCase(),p=$('loginPw').value;if(!e||!p)return($('loginError').textContent=lang==='en'?'Please enter email and password':'请输入邮箱和密码');let a=gA();if(!a[e])return($('loginError').textContent=lang==='en'?'Account not found':'账户不存在');let h=await hPW(p);if(h!==a[e].pw)return($('loginError').textContent=lang==='en'?'Wrong password':'密码错误');sS({email:e,loginTime:Date.now()});lU(e)}
+function lU(e){$('authScreen').style.display='none';lUD(e);$('hdrUser').textContent=e;uL=false;dL();iA()}
+function lOut(){if(!confirm(lang==='en'?'Logout?':'退出登录？'))return;cS();curUser=null;$('hdrUser').textContent='';$('authScreen').style.display='flex';sF('loginForm');$('lockScreen').classList.remove('open')}
+async function hFgt(){let st=$('forgotBtn').dataset.step||'send';if(st==='send'){let e=$('forgotEmail').value.trim().toLowerCase();if(!e)return($('forgotError').textContent=lang==='en'?'Please enter email':'请输入注册邮箱');let a=gA();if(!a[e])return($('forgotError').textContent=lang==='en'?'Email not registered':'该邮箱未注册');let c=Math.floor(100000+Math.random()*900000).toString();pCodes['r_'+e]=c;$('forgotCodeDisplay').textContent=c;$('forgotCodeDisplay').style.display='block';$('forgotHint').style.display='block';$('forgotCode').style.display='';$('forgotNewPw').style.display='';$('forgotNewPw2').style.display='';$('forgotBtn').textContent=lang==='en'?'Reset':'重置密码';$('forgotError').textContent='';$('forgotBtn').dataset.step='reset';$('forgotForm').dataset.email=e;return}let e=$('forgotForm').dataset.email,c=$('forgotCode').value.trim(),p=$('forgotNewPw').value,p2=$('forgotNewPw2').value;if(c!==pCodes['r_'+e])return($('forgotError').textContent=lang==='en'?'Invalid code':'验证码错误');if(!p||p.length<6)return($('forgotError').textContent=lang==='en'?'Password must be at least 6 characters':'密码至少6位');if(p!==p2)return($('forgotError').textContent=lang==='en'?'Passwords do not match':'两次密码不一致');let a=gA();a[e].pw=await hPW(p);sA(a);delete pCodes['r_'+e];$('forgotBtn').dataset.step='';$('forgotError').textContent='';alert(lang==='en'?'Password reset, please login with new password':'密码已重置，请用新密码登录');sF('loginForm')}
+
+/* ===== Lock ===== */
+function dL(){$('lockScreen').classList.add('open');$('lockPw').value='';$('lockError').textContent='';$('lockPw').focus()}
+function hDL(){$('lockScreen').classList.remove('open')}
+async function hUnl(){if(!curUser)return;let p=$('lockPw').value;if(!p)return;let a=gA(),h=await hPW(p);if(h===a[curUser].pw){uL=true;hDL();$('lockToggle').textContent='\u{1F512}';sAL();r()}else{$('lockError').textContent=lang==='en'?'Wrong password':'密码错误';$('lockPw').value='';$('lockPw').focus()}}
+function doL(){uL=false;cAL();$('lockToggle').textContent='\u{1F513}';dL()}
+function sAL(){clearTimeout(aTO);if(uL){aTO=setTimeout(()=>{if(uL)doL()},AL)}}
 function cAL(){clearTimeout(aTO);$('lockIndicator').textContent='';$('hdrRight').classList.remove('unlocked')}
-function rA(){if(uL&&gSH()){clearTimeout(aTO);aTO=setTimeout(()=>{if(uL)lk()},AL)}}
-setInterval(()=>{if(uL&&gSH()&&aTO){let s=aTO._idleStart||0,r=Math.max(0,Math.round((AL-(Date.now()-s))/1000));$('lockIndicator').textContent=r>60?Math.floor(r/60)+'m':r+'s'}},1000)
-function oPS(){let h=gSH();$('pwOldField').style.display=h?'block':'none';$('pwModalTitle').textContent=h?'修改密码':'设置密码';$('pwHint').textContent=h?'留空新密码并保存可清除密码':'设置一个密码来保护你的书签';$('pwOld').value='';$('pwNew').value='';$('pwConfirm').value='';$('pwModal').classList.add('open')}
-async function sPS(){let h=gSH();if(h){let o=$('pwOld').value;if(!o)return alert('请输入当前密码');if((await hPW(o))!==h)return alert('当前密码错误')}let n=$('pwNew').value,c=$('pwConfirm').value;if(n||c){if(n!==c)return alert('两次密码不一致');if(n.length<4)return alert('密码至少 4 位')}let nh=n?await hPW(n):'';sSH(nh);$('pwModal').classList.remove('open');if(nh)alert('密码已'+(h?'修改':'设置'));else alert('密码已清除');if(!nh&&!uL)uL=true;if(!nh){$('lockScreen').classList.remove('open');$('lockToggle').textContent='\u{1F512}';cAL();r()}else if(uL){sAL()}}
-function cPS(){$('pwModal').classList.remove('open')}
-function pT(s){return s.split('#').map(t=>t.trim()).filter(t=>t.length)}
-function aB(){let t=$('inputTitle').value.trim(),u=$('inputUrl').value.trim(),g=$('inputGroup').value,ts=pT($('inputTags').value),d=$('inputDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);B.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:t,url:u,tags:ts,group:g,desc:d,createdAt:Date.now()});sv();$('inputTitle').value='';$('inputUrl').value='';$('inputTags').value='';$('inputDesc').value='';$('inputTitle').focus();aG=g||'__all__';r()}
+function rA(){if(uL){clearTimeout(aTO);aTO=setTimeout(()=>{if(uL)doL()},AL)}}
+setInterval(()=>{if(uL&&aTO){let s=aTO._idleStart||0,r=Math.max(0,Math.round((AL-(Date.now()-s))/1000));$('lockIndicator').textContent=r>60?Math.floor(r/60)+'m':r+'s'}},1000)
+
+/* ===== Init App ===== */
+function iA(){let t=localStorage.getItem(TK)||'light',f=localStorage.getItem(FK)||'14';document.body.setAttribute('data-theme',t);document.documentElement.style.setProperty('--fs',f+'px');let s=gS();if(s.email&&s.email===curUser)dL();if(uL)r();$('settingsAccount').textContent=(lang==='en'?'Logged in: ':'已登录: ')+curUser;applyLang()}
+function oAR(){let s=gS();if(s.email){lUD(s.email);if(curUser){$('authScreen').style.display='none';$('hdrUser').textContent=curUser;dL();iA();return}}let oB=[];try{oB=JSON.parse(localStorage.getItem('codex_bookmarks')||'[]')}catch{}applyLang();sF(oB.length>0?'registerForm':'loginForm')}
+
+/* ===== Data ===== */
+function pt(s){return s.split('#').map(t=>t.trim()).filter(t=>t.length)}
+function aB(){let t=$('inputTitle').value.trim(),u=$('inputUrl').value.trim(),g=$('inputGroup').value,ts=pt($('inputTags').value),d=$('inputDesc').value.trim();if(!t)return alert(lang==='en'?'Please enter a title':'请输入标题');if(!u)return alert(lang==='en'?'Please enter a URL':'请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);B.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title:t,url:u,tags:ts,group:g,desc:d,createdAt:Date.now()});sUD();$('inputTitle').value='';$('inputUrl').value='';$('inputTags').value='';$('inputDesc').value='';$('inputTitle').focus();aG=g||'__all__';r()}
 function oE(id){let b=B.find(x=>x.id===id);if(!b)return;eId=id;$('editTitle').value=b.title;$('editUrl').value=b.url;$('editTags').value=b.tags.join(' # ');$('editDesc').value=b.desc||'';let s=$('editGroup');s.innerHTML='';G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;if(g===b.group)o.selected=true;s.appendChild(o)});$('editModal').classList.add('open')}
-function sE(){let b=B.find(x=>x.id===eId);if(!b)return;let t=$('editTitle').value.trim(),u=$('editUrl').value.trim(),g=$('editGroup').value,ts=pT($('editTags').value),d=$('editDesc').value.trim();if(!t)return alert('请输入标题');if(!u)return alert('请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);Object.assign(b,{title:t,url:u,tags:ts,group:g,desc:d});sv();cE();r()}
+function sE(){let b=B.find(x=>x.id===eId);if(!b)return;let t=$('editTitle').value.trim(),u=$('editUrl').value.trim(),g=$('editGroup').value,ts=pt($('editTags').value),d=$('editDesc').value.trim();if(!t)return alert(lang==='en'?'Please enter a title':'请输入标题');if(!u)return alert(lang==='en'?'Please enter a URL':'请输入 URL');if(!/^https?:\/\//i.test(u))u='https://'+u;if(g&&!G.includes(g))G.push(g);Object.assign(b,{title:t,url:u,tags:ts,group:g,desc:d});sUD();cE();r()}
 function cE(){eId=null;$('editModal').classList.remove('open')}
-function dB(id){if(!confirm('删除这个书签？'))return;B=B.filter(b=>b.id!==id);sv();r()}
-function aG2(){let n=prompt('输入分组名称：');if(!n||!n.trim())return;n=n.trim();if(G.includes(n))return alert('该分组已存在');G.push(n);sv();aG=n;r()}
-function rG(on){let n=prompt('输入新名称：',on);if(!n||!n.trim()||n.trim()===on)return;n=n.trim();if(G.includes(n))return alert('该名称已存在');let i=G.indexOf(on);if(i===-1)return;G[i]=n;B.forEach(b=>{if(b.group===on)b.group=n});sv();if(aG===on)aG=n;r()}
-function dG(n){if(n==='默认')return alert('不能删除默认分组');let c=B.filter(b=>b.group===n).length;if(c>0&&!confirm('\u300A'+n+'\u300B中有 '+c+' 个书签，移动到「默认」并删除此分组？'))return;G=G.filter(g=>g!==n);B.forEach(b=>{if(b.group===n)b.group='默认'});sv();if(aG===n)aG='__all__';r()}
+function dB(id){if(!confirm(lang==='en'?'Delete this bookmark?':'删除这个书签？'))return;B=B.filter(b=>b.id!==id);sUD();r()}
+function aG2(){let n=prompt(lang==='en'?'Enter group name:':'输入分组名称：');if(!n||!n.trim())return;n=n.trim();if(G.includes(n))return alert(lang==='en'?'Group already exists':'该分组已存在');G.push(n);sUD();aG=n;r()}
+function rG(on){let n=prompt(lang==='en'?'Enter new name:':'输入新名称：',on);if(!n||!n.trim()||n.trim()===on)return;n=n.trim();if(G.includes(n))return alert(lang==='en'?'Name already exists':'该名称已存在');let i=G.indexOf(on);if(i===-1)return;G[i]=n;B.forEach(b=>{if(b.group===on)b.group=n});sUD();if(aG===on)aG=n;r()}
+function dG(n){if(n==='默认')return alert(lang==='en'?'Cannot delete default group':'不能删除默认分组');let c=B.filter(b=>b.group===n).length;if(c>0&&!confirm('\u300A'+n+'\u300B'+(lang==='en'?' has ':'中有 ')+c+(lang==='en'?' bookmarks, move to Default and delete?':' 个书签，移动到「默认」并删除此分组？')))return;G=G.filter(g=>g!==n);B.forEach(b=>{if(b.group===n)b.group='默认'});sUD();if(aG===n)aG='__all__';r()}
 function aT2(){let m={};B.forEach(b=>b.tags.forEach(t=>m[t]=(m[t]||0)+1));return Object.entries(m).sort((a,b)=>b[1]-a[1])}
 function gFB(){let l=B.slice();if(aG!=='__all__')l=l.filter(b=>b.group===aG);if(aT)l=l.filter(b=>b.tags.includes(aT));let q=sT.trim().toLowerCase();if(q)l=l.filter(b=>b.title.toLowerCase().includes(q)||b.url.toLowerCase().includes(q)||(b.desc||'').toLowerCase().includes(q)||b.tags.some(t=>t.toLowerCase().includes(q)));l.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));return l}
-function r(){let f=gFB(),ta=aT2();$('totalCount').textContent=B.length
-let gc=$('groupList');gc.innerHTML='';function mGI(l,k,c,a){let d=document.createElement('div');d.className='group-item'+(a?' active':'');let ns=document.createElement('span');ns.className='gname';ns.textContent=l;let cs=document.createElement('span');cs.className='gcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aG=k;if(k!=='__all__')aT=null;r()});return d}gc.appendChild(mGI('\u{1F4C2} 全部书签','__all__',B.length,aG==='__all__'));G.forEach(n=>{let c=B.filter(b=>b.group===n).length,it=mGI('\u{1F4C1} '+n,n,c,aG===n);if(n!=='默认'){let a=document.createElement('span');a.className='group-actions';let rb=document.createElement('button');rb.textContent='\u{270E}';rb.title='重命名';rb.addEventListener('click',e=>{e.stopPropagation();rG(n)});let db=document.createElement('button');db.textContent='\u{2715}';db.title='删除分组';db.className='del-group';db.addEventListener('click',e=>{e.stopPropagation();dG(n)});a.appendChild(rb);a.appendChild(db);it.appendChild(a)}gc.appendChild(it)})
-let tsb=$('tagSidebarList');tsb.innerHTML='';if(ta.length===0){let e=document.createElement('div');e.style.cssText='padding:.35rem 1rem;font-size:.78rem;color:var(--text3)';e.textContent='暂无标签';tsb.appendChild(e)}else{ta.forEach(([n,c])=>{let d=document.createElement('div');d.className='tag-sb-item'+(n===aT?' active':'');let ns=document.createElement('span');ns.textContent='# '+n;let cs=document.createElement('span');cs.className='tcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aT=aT===n?null:n;r()});tsb.appendChild(d)})}
-let tc=$('tagFilterGroup');tc.innerHTML='';ta.forEach(([n,c])=>{let ch=document.createElement('span');ch.className='tag-chip'+(n===aT?' active':'');ch.textContent='#'+n+' '+c;ch.addEventListener('click',()=>{aT=aT===n?null:n;r()});tc.appendChild(ch)})
-let sel=$('inputGroup');sel.innerHTML='';let eo=document.createElement('option');eo.value='';eo.textContent='（无分组）';sel.appendChild(eo);G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;sel.appendChild(o)});if(aG!=='__all__')sel.value=aG
-let ct=$('bookmarkList');if(f.length===0){ct.innerHTML='<div class="empty-state">'+(B.length===0?'还没有书签 \u{1F3AF}':'没有匹配的书签')+'</div>';return}
-ct.innerHTML='';f.forEach(b=>{let it=document.createElement('div');it.className='bookmark-item';let ic=document.createElement('div');ic.className='bookmark-icon';let im=document.createElement('img');let host;try{host=new URL(b.url).hostname}catch{host=''}im.src=host?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=32':'';im.alt='';im.onerror=()=>{ic.innerHTML='\u{1F516}'};ic.appendChild(im);let bd=document.createElement('div');bd.className='bookmark-body';let lk=document.createElement('a');lk.className='bookmark-title';lk.href=b.url;lk.target='_blank';lk.rel='noopener noreferrer';lk.textContent=b.title;let ul=document.createElement('div');ul.className='bookmark-url';ul.textContent=b.url+(b.group?' - '+b.group:'');let dd=document.createElement('div');dd.className='bookmark-desc';if(b.desc)dd.textContent=b.desc;let tw=document.createElement('div');tw.className='bookmark-tags';b.tags.forEach(t=>{let tg=document.createElement('span');tg.className='bookmark-tag';tg.textContent='#'+t;tg.addEventListener('click',()=>{aT=t;r()});tw.appendChild(tg)});bd.appendChild(lk);bd.appendChild(ul);if(b.desc)bd.appendChild(dd);bd.appendChild(tw);let ac=document.createElement('div');ac.className='bookmark-actions';let eb=document.createElement('button');eb.className='btn btn-ghost';eb.textContent='\u{270E}';eb.title='编辑';eb.addEventListener('click',()=>oE(b.id));ac.appendChild(eb);let db=document.createElement('button');db.className='btn btn-danger';db.textContent='\u{2715}';db.title='删除';db.addEventListener('click',()=>dB(b.id));ac.appendChild(db);it.appendChild(ic);it.appendChild(bd);it.appendChild(ac);ct.appendChild(it)})}
-ld();lS();iL().then(()=>{if(uL)r()});
-$('lockUnlock').addEventListener('click',async()=>{let p=$('lockPw').value;if(!p)return;if(await tU(p))r();else{$('lockError').textContent='密码错误';$('lockPw').value='';$('lockPw').focus()}});
-$('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')$('lockUnlock').click()});
-$('lockShowSet').addEventListener('click',()=>{oPS();$('lockScreen').classList.remove('open')});
-$('lockToggle').addEventListener('click',()=>{gSH()?lk():oPS()});
-$('settingsBtn').addEventListener('click',()=>{lS();$('settingsModal').classList.add('open')});
+function r(){
+let f=gFB(),ta=aT2();$('totalCount').textContent=B.length;applyLang();
+let gc=$('groupList');gc.innerHTML='';
+function mGI(l,k,c,a){let d=document.createElement('div');d.className='group-item'+(a?' active':'');let ns=document.createElement('span');ns.className='gname';ns.textContent=l;let cs=document.createElement('span');cs.className='gcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aG=k;if(k!=='__all__')aT=null;r()});return d}
+gc.appendChild(mGI('\u{1F4C2} '+_('allStd'),'__all__',B.length,aG==='__all__'));
+G.forEach(n=>{let c=B.filter(b=>b.group===n).length,it=mGI('\u{1F4C1} '+n,n,c,aG===n);if(n!=='默认'){let a=document.createElement('span');a.className='group-actions';let rb=document.createElement('button');rb.textContent='\u{270E}';rb.title=_('rename');rb.addEventListener('click',e=>{e.stopPropagation();rG(n)});let db=document.createElement('button');db.textContent='\u{2715}';db.title=_('delete');db.className='del-group';db.addEventListener('click',e=>{e.stopPropagation();dG(n)});a.appendChild(rb);a.appendChild(db);it.appendChild(a)}gc.appendChild(it)});
+let tsb=$('tagSidebarList');tsb.innerHTML='';
+if(ta.length===0){let e=document.createElement('div');e.style.cssText='padding:.35rem 1rem;font-size:.78rem;color:var(--text3)';e.textContent=_('noTags');tsb.appendChild(e)}else{ta.forEach(([n,c])=>{let d=document.createElement('div');d.className='tag-sb-item'+(n===aT?' active':'');let ns=document.createElement('span');ns.textContent='# '+n;let cs=document.createElement('span');cs.className='tcount';cs.textContent=c;d.appendChild(ns);d.appendChild(cs);d.addEventListener('click',()=>{aT=aT===n?null:n;r()});tsb.appendChild(d)})};
+let tc=$('tagFilterGroup');tc.innerHTML='';ta.forEach(([n,c])=>{let ch=document.createElement('span');ch.className='tag-chip'+(n===aT?' active':'');ch.textContent='#'+n+' '+c;ch.addEventListener('click',()=>{aT=aT===n?null:n;r()});tc.appendChild(ch)});
+let sel=$('inputGroup');sel.innerHTML='';let eo=document.createElement('option');eo.value='';eo.textContent=_('noGroup');sel.appendChild(eo);G.forEach(g=>{let o=document.createElement('option');o.value=g;o.textContent=g;sel.appendChild(o)});if(aG!=='__all__')sel.value=aG;
+let ct=$('bookmarkList');if(f.length===0){ct.innerHTML='<div class="empty-state">'+(B.length===0?'\u{1F3AF} '+(lang==='en'?'No bookmarks yet':'还没有书签'):_('noMatch'))+'</div>';return}
+ct.innerHTML='';f.forEach(b=>{
+let it=document.createElement('div');it.className='bookmark-item';
+let ic=document.createElement('div');ic.className='bookmark-icon';let im=document.createElement('img');let host;try{host=new URL(b.url).hostname}catch{host=''};im.src=host?'https://www.google.com/s2/favicons?domain='+encodeURIComponent(host)+'&sz=32':'';im.alt='';im.onerror=()=>{ic.innerHTML='\u{1F516}'};ic.appendChild(im);
+let bd=document.createElement('div');bd.className='bookmark-body';
+let lk=document.createElement('a');lk.className='bookmark-title';lk.href=b.url;lk.target='_blank';lk.rel='noopener noreferrer';lk.textContent=b.title;
+let ul=document.createElement('div');ul.className='bookmark-url';ul.textContent=b.url+(b.group?' - '+b.group:'');
+let dd=document.createElement('div');dd.className='bookmark-desc';if(b.desc)dd.textContent=b.desc;
+let tw=document.createElement('div');tw.className='bookmark-tags';b.tags.forEach(t=>{let tg=document.createElement('span');tg.className='bookmark-tag';tg.textContent='#'+t;tg.addEventListener('click',()=>{aT=t;r()});tw.appendChild(tg)});
+bd.appendChild(lk);bd.appendChild(ul);if(b.desc)bd.appendChild(dd);bd.appendChild(tw);
+let ac=document.createElement('div');ac.className='bookmark-actions';
+let eb=document.createElement('button');eb.className='btn btn-ghost';eb.textContent='\u{270E}';eb.title=_('edit');eb.addEventListener('click',()=>oE(b.id));ac.appendChild(eb);
+let db=document.createElement('button');db.className='btn btn-danger';db.textContent='\u{2715}';db.title=_('delete');db.addEventListener('click',()=>dB(b.id));ac.appendChild(db);
+it.appendChild(ic);it.appendChild(bd);it.appendChild(ac);ct.appendChild(it);
+})}
+
+/* ===== Events ===== */
+$('regBtn').addEventListener('click',hReg);$('regPw2').addEventListener('keydown',e=>{if(e.key==='Enter')$('regBtn').click()});
+$('verifyBtn').addEventListener('click',hVer);$('verifyInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('verifyBtn').click()});
+$('loginBtn').addEventListener('click',hLog);$('loginPw').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+$('showRegister').addEventListener('click',()=>sF('registerForm'));$('showLogin').addEventListener('click',()=>sF('loginForm'));$('showForgot').addEventListener('click',()=>sF('forgotForm'));$('backToLogin').addEventListener('click',()=>sF('loginForm'));$('forgotBtn').addEventListener('click',hFgt);$('forgotNewPw2').addEventListener('keydown',e=>{if(e.key==='Enter')$('forgotBtn').click()});
+$('lockBtn').addEventListener('click',hUnl);$('lockPw').addEventListener('keydown',e=>{if(e.key==='Enter')hUnl()});$('lockToggle').addEventListener('click',()=>{uL?doL():null});$('logoutBtn').addEventListener('click',lOut);
+$('settingsBtn').addEventListener('click',()=>{applyLang();$('settingsModal').classList.add('open')});
 $('settingsClose').addEventListener('click',()=>$('settingsModal').classList.remove('open'));
 $('settingsModal').addEventListener('click',e=>{if(e.target===e.currentTarget)$('settingsModal').classList.remove('open')});
-document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.addEventListener('click',()=>sTv(el.dataset.val)));
-document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.addEventListener('click',()=>sFv(el.dataset.val)));
-$('btnAdd').addEventListener('click',aB);
-$('inputTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputUrl').focus()});
-$('inputUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputTags').focus()});
-$('inputTags').addEventListener('keydown',e=>{if(e.key==='Enter')aB()});
-$('addGroupBtn').addEventListener('click',aG2);
-$('editSave').addEventListener('click',sE);$('editCancel').addEventListener('click',cE);
-$('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)cE()});
-$('editTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('editUrl').focus()});
-$('editUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('editDesc').focus()});
-$('editDesc').addEventListener('keydown',e=>{if(e.key==='Enter')sE()});
-$('pwSave').addEventListener('click',sPS);$('pwCancel').addEventListener('click',cPS);
-$('pwModal').addEventListener('click',e=>{if(e.target===e.currentTarget)cPS()});
-$('pwNew').addEventListener('keydown',e=>{if(e.key==='Enter')$('pwConfirm').focus()});
-$('pwConfirm').addEventListener('keydown',e=>{if(e.key==='Enter')sPS()});
-$('searchInput').addEventListener('input',e=>{sT=e.target.value;r()});
-$('clearFilter').addEventListener('click',()=>{aT=null;$('searchInput').value='';sT='';r()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){cE();cPS();$('settingsModal').classList.remove('open')}});
+document.querySelectorAll('#themeOptions .set-opt').forEach(el=>el.addEventListener('click',()=>{localStorage.setItem(TK,el.dataset.val);document.body.setAttribute('data-theme',el.dataset.val);applyLang()}));
+document.querySelectorAll('#fsOptions .set-opt').forEach(el=>el.addEventListener('click',()=>{localStorage.setItem(FK,el.dataset.val);document.documentElement.style.setProperty('--fs',el.dataset.val+'px');applyLang()}));
+document.querySelectorAll('#langOptions .set-opt').forEach(el=>el.addEventListener('click',()=>{lang=el.dataset.val;localStorage.setItem(LK,lang);applyLang();document.title=lang==='en'?'Bookmark Manager':'书签管理器'}));
+$('btnAdd').addEventListener('click',aB);$('inputTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputUrl').focus()});$('inputUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('inputTags').focus()});$('inputTags').addEventListener('keydown',e=>{if(e.key==='Enter')aB()});$('addGroupBtn').addEventListener('click',aG2);
+$('editSave').addEventListener('click',sE);$('editCancel').addEventListener('click',cE);$('editModal').addEventListener('click',e=>{if(e.target===e.currentTarget)cE()});$('editTitle').addEventListener('keydown',e=>{if(e.key==='Enter')$('editUrl').focus()});$('editUrl').addEventListener('keydown',e=>{if(e.key==='Enter')$('editDesc').focus()});$('editDesc').addEventListener('keydown',e=>{if(e.key==='Enter')sE()});
+$('searchInput').addEventListener('input',e=>{sT=e.target.value;r()});$('clearFilter').addEventListener('click',()=>{aT=null;$('searchInput').value='';sT='';r()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('settingsModal').classList.remove('open');cE()}});
 ['mousedown','keydown','touchstart','scroll','wheel'].forEach(ev=>document.addEventListener(ev,rA,{passive:true}));
+oAR();
 </script></body></html>
